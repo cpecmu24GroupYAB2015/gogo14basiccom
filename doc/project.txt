@@ -30,6 +30,7 @@
 - กระปุกออมสินเตือนลืม
 - Funny Beer (บีบแขนหมี/ตุ๊กตา)
 - ตู้นิรภัย
+- รถกระต่ายโง่ (รถกระต่ายวิ่งตามแสง)
 
 ระดับปานกลาง
 - เครื่องแยกลูกปิงปอง
@@ -48,6 +49,7 @@
 - ชั้นวางรองเท้าอัตโนมัติ
 - automatic window cleaner
 - แบบจำลองร้านค้าอัตโนมัติ (ค่าเฟ่)
+- Smart Bookshelf
 
 ระดับยาก
 - ห้องสมุดอัจฉริยะ (ชั้นวางของอัตโนมัติ)
@@ -66,7 +68,8 @@
 กลาง
 - เกมนักแม่นปืน
 - เกมนักมวย Bagearsoft
-- Fabpy GOGO 
+- Fabpy GOGO
+- Rooney Football Game ()
 
 ยาก
 -
@@ -81,6 +84,10 @@
 - Pressure Sensors
 -- ใช้แผ่นทองแดงนำไฟฟ้าประกบสองข้างของ วัสดุรูพรุนยืดหยุ่นไม่นำไฟฟ้า http://www.instructables.com/id/Combo-Blocks/step4/Homemade-Pressure-Sensors/
 -- http://www.instructables.com/id/DIY-Force-Sensitive-Resistor-FSR/ 
+
+-----------------
+การใช้ส่วนติดต่อ UI ละทำไง
+- ในที่นี่เราจะใช้ โปรแกรม SNAP ในการติดต่อกับ GOGO wigets
 
 -----------------
 ถ้าฉันจะทำเกมละ ...
