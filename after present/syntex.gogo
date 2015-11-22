@@ -1,0 +1,76 @@
+to main
+    ; this comment
+    ; you can use other name in first persiuer
+    ; if use want autostart when turn on you can rename "main" to "autorun"
+
+    ; ::::: Global variable :::::::
+    ; maximum var mem = 16 (in gogoboard firmwork 111)
+
+    set numberic 0
+    set globalvariable numberic
+
+    ; ::::: condition :::::
+    ifelse( numberic = 1)[
+        if(globalvariable = 1)[
+            beep
+            wait
+        ]
+    ]
+        ; ::::: else not write :::::
+    [ 
+        set sth_value 15
+        do_not_sth_func 15
+    ]
+
+end
+
+to do_not_sth_func :privateVariable :time_in_one_Part_ten
+
+    set thisglobla_variable 1234
+    show "hiho"
+    wait time_in_one_Part_ten
+    show privateVariable
+    wait time_in_one_Part_ten + 2
+
+    ; :::::: how many of stack :::::::
+    ; :::::: about 2^16 it's mean you can use below function only 4 times
+
+    stackOfFunction p1 p2 p3 p4 p5 p6
+    this_Recursive 30   ; you well see maximum stack if used high number
+
+
+
+end
+
+to this_Recursive :value
+    ifelse(value > 0)[
+        show value
+        this_Recursive (value-1)
+        wait 10
+    ]
+    [
+        output 0
+    ]
+end
+
+to stackOfFunction :p1 :p2 :p3 :p4 :p5 :p6
+    stackOfFunction2 p1 p2 p3 p4 p5 p6
+end
+
+to stackOfFunction2 :p1 :p2 :p3 :p4 :p5 :p6
+    stackOfFunction3 p1 p2 p3 p4 p5 p6
+end
+
+to stackOfFunction3 :p1 :p2 :p3 :p4 :p5 :p6
+    ifelse( function_will_dont_work_in_this 15 = 15)[
+        ;  the gogo board will reset
+        show "erro"
+        output p1*1+p2*2+p3*4+p4*8+p5*16+p6*32
+    ][
+        output 555
+    ]
+end
+
+to function_will_dont_work_in_this :value
+    output value
+end

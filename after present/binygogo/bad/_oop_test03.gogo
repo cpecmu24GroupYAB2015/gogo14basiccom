@@ -1,0 +1,313 @@
+to main
+reset_all
+show_binarygogo 1
+forever[
+;----------------------------
+    if(menu_ = 0)[
+        selc sensor8
+    ]
+;----------------------------
+    if(not(menu_ = 0))[lampoff 1]
+    if(menu_ = 14)[
+        show readans
+        wait 1
+        lampon 1
+        wait 2 lampoff 1
+    ]
+    if(menu_ = 24)[
+        set score 999
+        wining 1
+        wait 10
+        reset_all
+    ]
+;------ Menu Game ------------
+    if(menu_ = 1)[
+        problem 1
+        your_score
+        wining 1
+        reset_all
+    ]
+    if(menu_ = 2)[
+        problem 2
+        your_score
+        wining 2
+        reset_all
+    ]
+    if(menu_ = 3)[
+        set score 500
+        wining 1
+        set menu_ 0
+    ]
+    if(menu_ = 4)[
+        show readans
+    ]
+]
+end
+
+;---------------model---------------
+
+to selc :regis
+    if(not (press_btn sensor7))[show "selc" ]
+        lampon 1
+        if(incolor sensor7 570 580)[
+            show "c 14" wait 2
+            set menu_ 14
+        ]
+        if(incolor sensor7 450 460 or incolor sensor8 450 460 )[
+            show "c 24" wait 2
+            set menu_ 24
+        ]
+        if(incolor sensor7 320 340)[
+            show "c 34" wait 2
+        ]
+        if(incolor sensor7 138 152)[
+            show "c  4" wait 2
+        ]
+        if(incolor sensor7 530 540)[
+            show "c  1" wait 2
+            show "Easy" wait 10
+            show "redy" wait 30
+            beep
+            set menu_ 1
+        ]
+        if(incolor sensor7 400 410)[
+            show "c  2" wait 2
+            set menu_ 2
+        ]
+        if(incolor sensor7 250 260)[
+            show "c  3" wait 2
+            set menu_ 4
+        ]
+end
+
+to press_btn :port_
+    if(port_ > 20)[output 1]
+    output 0
+end
+
+to reset_all
+    abcd, off ccw
+    set menu_ 0
+    set score 0
+    reset_ans
+    set count 0
+    set qcount 0
+end
+
+to harder :num
+    output ((num+17)*(num+19)*(num+17))/491
+end
+
+to wining :num 
+    if(score > harder num )[
+        show "free"
+        repeat num[lampon 4 wait 2 lampoff 4 beep wait 10]
+    ]
+end
+
+to reset_ans
+    set ans 0
+    set p1 0
+    set p2 0
+    set p3 0
+    set p4 0
+    set p5 0
+    set p6 0
+end
+
+to ch_problem :level
+     ifelse(level > 1)[problem_hardcore 1]
+    [problem level]
+end
+
+to problem_rep 
+    beep
+    show "nQ"
+    wait 10
+    show qcount
+    wait 10
+    show "see"
+    wait 15
+    set p1 cal_
+    set p2 cal_
+    set p3 cal_
+    set p4 cal_
+    set p5 cal_
+    set p6 cal_
+    set question (sum_ p1 p2 p3 p4 p5 p6)
+    lampon 3
+    seem question 10
+    reset_ans
+
+end
+
+to problem :level
+set qcount 0
+set qcount (harder level)
+repeat qcount[
+    problem_rep
+    wait 10
+    show "redy"
+    wait 15     
+    rbeep 30
+    time_ 7 0
+    lampoff 3
+    show "ansr"
+    wait 10
+    show readans
+    wait 10
+    ifelse ( readans = question )[
+        set score score+1
+        show "corr"
+        wait 10
+    ][show "inco" wait 10]
+    show "out"
+    lampon 2
+    rbeep 60
+    set qcount (qcount-1)
+    wait 20
+    lampoff 2
+    ]
+end
+
+to problem_hardcore :num
+set qcount 0
+set qcount num
+repeat num[
+    problem_rep
+    wait 10
+    show "redy"
+    wait 15     
+    rbeep 30
+    time_ 7 1
+    lampoff 3
+    show "ansr"
+    wait 10
+    show readans
+    wait 10
+    ifelse ( readans = question )[
+        set score score+1
+        show "corr"
+        wait 10
+    ][show "inco" wait 10]
+    show "out"
+    lampon 2
+    rbeep 60
+    set qcount (qcount-1)
+    wait 20
+    lampoff 2
+]
+end
+
+
+
+;---------------view----------------
+to show_binarygogo :delay
+ show "biny" beep wait delay show "   " wait delay+2 beep show "gogo" wait delay+2 show "b038" wait 5 show "selc" rbeep 20
+
+end
+
+to your_score
+show "   U" wait 3 show "  U " wait 3 show " U S" wait 3 show "U sc" wait 3 show " scr" wait 3 show "scro" wait 3 show "cror" wait 3 show "rore" wait 3 show "ore " wait 3 show "re  " wait 3 show "e  " wait 3 show "    " wait 3 show "is" wait 8 beep show score wait 20 rbeep 20
+end
+
+;+------------ Time -----------+
+to time_ :sec :ms
+    set count 0
+    set count sec
+    ifelse(ms = 0)[
+        repeat (sec)[
+            wait 1
+            show count
+            if(press_btn sensor7)[stop]
+            ifelse(count > 0)[
+                if(count < 11)[beep]
+                set count (count-1)
+                wait 9
+            ][
+            rbeep 30 wait 10
+            ]
+        ]
+    ][
+        set count sec*10
+        repeat (sec*10)[
+            wait 1
+            show count
+            if(press_btn sensor7)[stop]
+            ifelse(count > 0)[
+                if(count < 50)[beep]
+                set count (count-1)
+            ][
+            rbeep 30 wait 10
+            ]
+        ]
+    ]
+    
+end
+
+;------------controller-------------
+to cal_
+    output ((random 1) % 2)
+end
+
+to sum_ :p1 :p2 :p3 :p4 :p5 :p6
+    output p1*1+p2*2+p3*4+p4*8+p5*16+p6*32
+end
+
+to rbeep :num
+    repeat num[beep]
+end
+
+to seem :p :sec
+    set count 0
+    set count sec
+    repeat (sec)[
+        ifelse(count < 6)[
+            repeat 2[beep show p wait 5 beep show "    " wait 5]
+        ][
+            show p set count (count-1) wait 10
+        ]
+
+    ]set count 0
+end
+
+to lampon :num
+    if(num = 1)[a, on cw]
+    if(num = 2)[b, on]
+    if(num = 3)[c, on]
+    if(num = 4)[d, on]
+end
+
+to lampoff :num
+    if(num = 1)[a, off]
+    if(num = 2)[b, off]
+    if(num = 3)[c, off]
+    if(num = 4)[d, off]
+end
+
+to incolor :port :min :max
+    ifelse(port > min-10 and port < max+10)[output 1][output 0]
+end
+
+to colorchk :port :min1 :max1 :min0 :max0
+    if(incolor port min1 max1)[set ref port wait 3 
+        ifelse(incolor ref (ref-5) (ref+5))[output 1][ output 99]
+    ]
+    ifelse(incolor port min0 max0)[set ref port wait 3 
+        ifelse(incolor ref (ref-5) (ref+5)) [output 0][ output 99]
+    ][output 99]
+end
+
+
+to readans
+    ;set ans sum_ 1 0 0 0 0 1
+    set ans sum_ (colorchk sensor1 286 296 988 993 ) (colorchk sensor2 238 247 987 994 ) (colorchk sensor3 169 186 974 990 ) (colorchk sensor4 246 261 990 998) (colorchk sensor5 298 320 990 998) (colorchk sensor6 192 220 983 993)
+    ifelse(ans > 63)[output 999][output ans]
+end
+
+to set_mean :value_
+    show "6666"
+    wait 2
+    show ""
+
+end

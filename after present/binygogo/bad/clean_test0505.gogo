@@ -1,0 +1,104 @@
+to main
+	set modea 1
+	set rttt 0
+	forever
+	[
+		set cans (summer 1 0 0 0 0 0)
+        set p1 cal
+        set p2 cal
+        set p3 cal
+        set p4 cal
+        set p5 cal
+        set p6 cal
+set an1 (iasNuma sensor1)
+set anp2 (summer an1 an1 an1 an1 an1 an1)
+set an3 (iasNuma sensor3)
+;set an4 (iasNuma sensor4)
+;set an5 (iasNuma sensor5)
+;set an6 (iasNuma sensor6)
+
+
+		
+		if(inbtw sensor7 574 578)[show "G  1" a, on b, off wait 6 set modea 1]
+		if(inbtw sensor7 459 459)[show "G  2" a, off b, on wait 6 set modea 2]
+		if(inbtw sensor7 326 342)[show "G  3" a, on b, on wait 6 set modea 3]
+		if(inbtw sensor7 142 152)[show "defl" a, off b, off wait 6 set modea 0 set rttt 0]
+		if (modea = 0) [show "hole" wait 1]
+
+		if(modea = 1)[
+			if (rttt  < 3) 
+			[
+				show cans	
+				wait 30 
+				show "rady" 
+				wait 10
+				set rttt rttt+1
+				calTime 1 cans anp2
+			]
+			if( rttt > 1 and rttt = 2)[
+				show "fin"
+				set rttt 0
+				set modea 0
+				wait 30
+			]
+		]
+
+		if(modea = 2)[
+			if (rttt  < 3) 
+			[
+				show cans	
+				wait 30 
+				show "rrrr" 
+				wait 10
+				set rttt rttt+1
+				calTime 1 cans (summer an1 an2 an3 an4 an5 an6)
+			]
+			if( rttt > 1 and rttt = 2)[
+				show "fin"
+				set rttt 0
+				set modea 0
+				wait 30
+			]
+		]
+	]
+end
+
+to cal
+	output ((random 1) % 2)
+end
+
+to summer :p1 :p2 :p3 :p4 :p5 :p6
+	output p1*1+p2*2+p3*4+p4*8+p5*16+p6*32
+end
+
+to iasNuma :ssm
+
+	if(inbtw ssm 100 200)[output 1]
+	if(inbtw ssm 300 400)[output 0]
+end
+
+to calTime :time :qs :ans
+	set t 0
+	set t time*10
+	set send 0
+	set count 0
+
+	repeat time *10
+	[
+		if(sensor8 > 500)[show "send" ifelse(qs = ans)[show "PPPP" output 3 stop][show "l 00" wait 10 stop]]
+		set t t-1
+		show t
+		wait 1		
+	]
+	show "out "
+	repeat 30
+	[
+		beep
+	]
+	wait 30
+end
+
+to inbtw :valuea :minaa :maxaa
+	if((valuea < 10) or (valuea > maxaa+1000))[	output 0]
+	if((valuea > minaa-10) and (valuea < maxaa+10))[set outa 1]
+end

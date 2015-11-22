@@ -1,0 +1,272 @@
+to main
+reset_all
+set menu_ 2
+show_binarygogo 1
+forever[
+;----------------------------
+    if(menu_ = 0)[
+        if(not (press_btn sensor7))[show "selc"]
+        if(incolor sensor7 570 580)[
+            show "c 14" wait 2
+            set menu_ 14
+        ]
+        if(incolor sensor7 450 460 or incolor sensor8 450 460 )[
+            show "c 24" wait 2
+            set menu_ 24
+        ]
+        if(incolor sensor7 320 340)[
+            show "c 34" wait 2
+        ]
+        if(incolor sensor7 138 152)[
+            show "c  4" wait 2
+        ]
+        if(incolor sensor7 530 540)[
+            show "c  1" wait 2
+            show "Easy" wait 10
+            show "redy" wait 30
+            beep
+            set menu_ 1
+        ]
+        if(incolor sensor7 400 410)[
+            show "c  2" wait 2
+            set menu_ 2
+        ]
+        if(incolor sensor7 250 260)[
+            show "c  3" wait 2
+            set menu_ 3
+        ]
+    ]
+;----------------------------
+    if(menu_ = 14)[
+        show "rrrr"
+        wait 1
+        time_ 5 1
+    ]
+    if(menu_ = 1)[
+        problem 12
+        your_score
+        set menu_ 0
+    ]
+    if(menu_ = 2)[
+        problem 20
+        your_score
+        wining 2
+        set menu_ 0
+    ]
+    if(menu_ = 3)[
+        lampon 4
+        wait 1
+        lampoff 4
+        set menu_ 0
+    ]
+    if(menu_ = 24)[
+        show readans
+        wait 2
+    ]
+]
+end
+
+;---------------model---------------
+to press_btn :port_
+    if(port_ > 20)[output 1]
+    output 0
+end
+
+to reset_all
+    abcd, off ccw
+    set menu_ 0
+    set score 0
+    reset_ans
+    set count 0
+    set qcount 0
+end
+
+to wining :num 
+    if(score > (((num+17)*(num+167)*((num+18)/491))))[
+        repeat num[lampon 4 wait 2 lampoff 4]
+    ]
+end
+
+to reset_ans
+    set ans 0
+    set p1 0
+    set p2 0
+    set p3 0
+    set p4 0
+    set p5 0
+    set p6 0
+end
+
+to problem_rep
+    beep
+    show "nQ"
+    wait 10
+    show qcount
+    wait 10
+    show "see"
+    wait 15
+    set p1 cal_
+    set p2 cal_
+    set p3 cal_
+    set p4 cal_
+    set p5 cal_
+    set p6 cal_
+    set question (sum_ p6 p5 p4 p3 p2 p1)
+    lampon 3
+    seem question 10
+    reset_ans
+end
+
+to problem :num
+set qcount 0
+set qcount num
+repeat num[
+    problem_rep
+    wait 5
+    show "redy"
+    wait 15     
+    rbeep 30
+    time_ 7 1
+    lampoff 3
+    show "ansr"
+    wait 10
+    show readans
+    wait 10
+    ifelse ( readans = question )[
+        set score score+1
+        show "corr"
+        wait 10
+    ][show "inco" wait 10]
+    show "out"
+    rbeep 60
+    set qcount (qcount-1)
+    wait 10
+    ]
+end
+
+to problem_hardcore :num
+set qcount 0
+set qcount num
+repeat num[
+
+    wait 5
+    show "redy"
+    wait 15     
+    rbeep 30
+    time_ 5 0
+    lampoff 3
+    ifelse ((sum_ 0 0 0 0 0 (press_btn sensor8)) = (sum_ 0 0 0 0 0 1))[
+        set score score+1
+        show "corr"
+        wait 10
+    ][show "inco" wait 10]
+    show "out"
+    rbeep 60
+    set qcount (qcount-1)
+    wait 10
+    ]
+end
+
+
+
+;---------------view----------------
+to show_binarygogo :delay
+ show "    " wait delay beep show "   b" wait delay beep show "  bi" wait delay beep show " bir" wait delay beep show "bira" wait delay show "irar" wait delay show "rary" wait delay show "ary " wait delay show "ry g" wait delay show "y go" wait delay show " gog" wait delay show "gogo" wait delay show "ogo " wait delay show "go  " wait delay show "o   " wait delay show "   " wait delay+2 beep show "biry" wait delay show "   " wait delay+2 beep show "gogo" wait delay show "" wait 3 show "b024" wait 5 show "selc" rbeep 20
+
+end
+
+to your_score
+show "   U" wait 3 show "  U " wait 3 show " U S" wait 3 show "U sc" wait 3 show " scr" wait 3 show "scro" wait 3 show "cror" wait 3 show "rore" wait 3 show "ore " wait 3 show "re  " wait 3 show "e  " wait 3 show "    " wait 3 show "is" wait 8 beep show score wait 20 rbeep 20
+end
+
+;+------------ Time -----------+
+to time_ :sec :ms
+    set count 0
+    set count sec
+    ifelse(ms = 0)[
+        repeat (sec)[
+            wait 1
+            show count
+            if(press_btn sensor7)[stop]
+            ifelse(count > 0)[
+                if(count < 11)[beep]
+                set count (count-1)
+                wait 9
+            ][
+            rbeep 30 wait 10
+            ]
+        ]
+    ][
+        set count sec*10
+        repeat (sec*10)[
+            wait 1
+            show count
+            if(press_btn sensor7)[stop]
+            ifelse(count > 0)[
+                if(count < 50)[beep]
+                set count (count-1)
+            ][
+            rbeep 30 wait 10
+            ]
+        ]
+    ]
+    
+end
+
+;------------controller-------------
+to cal_
+    output ((random 1) % 2)
+end
+
+to sum_ :p6 :p5 :p4 :p3 :p2 :p1
+    output p6*1+p5*2+p4*4+p3*8+p2*16+p1*32
+end
+
+to rbeep :num
+    repeat num[beep]
+end
+
+to seem :p :sec
+    set count 0
+    set count sec
+    repeat (sec)[
+        ifelse(count < 6)[
+            repeat 2[beep show p wait 5 beep show "    " wait 5]
+        ][
+            show p set count (count-1) wait 10
+        ]
+
+    ]set count 0
+end
+
+to lampon :num
+    if(num = 1)[a, on]
+    if(num = 2)[b, on]
+    if(num = 3)[c, on]
+    if(num = 4)[d, on]
+end
+
+to lampoff :num
+    if(num = 1)[a, off]
+    if(num = 2)[b, off]
+    if(num = 3)[c, off]
+    if(num = 4)[d, off]
+end
+
+to incolor :port :min :max
+    ifelse(port > min-10 and port < max+10)[output 1][output 0]
+end
+
+to colorchk :port
+    ifelse(port > 300)[
+        ifelse(incolor port 800 1024)[output 1][output 0]
+    ][output 5]
+end
+
+
+to readans
+    ;set p5 (incolor sensor5 800 1024)
+    ;set ans sum_ (colorchk sensor1) (colorchk sensor2) (colorchk sensor3) (colorchk sensor4) (colorchk sensor5) (colorchk sensor6)
+    set ans sum_ 0 0 0 0 (colorchk sensor5) 0
+    ifelse(ans > 63)[output 999][output ans]
+    end
