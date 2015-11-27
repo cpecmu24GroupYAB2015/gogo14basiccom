@@ -10,6 +10,7 @@ forever[
         if(not (press_btn sensor7)) [show "selc" ]
         menu_circle sensor8
         lampon 1
+        ;------ Shortcut menu --------
         if( incolor sensor7 570 580)[
             show "c 14" wait 2
             set menu_ 14
@@ -37,6 +38,7 @@ forever[
             show "c  3" wait 2
             set menu_ 4
         ]
+        ;------ End Shortcut menu --------
     ]
 ;----------------------------
     if(not(menu_ = 0))[lampoff 1]
@@ -148,12 +150,12 @@ to problem :level
     wait 20
     lampoff 5
     ;-------------------------------------
-    ;set qcount (harder level)
-    if(menu_ > 1)[set qcount level]
+    set qcount (harder level)
     if(menu_ > 90)[
         set qcount 99
         
     ]
+    if(menu_ = 61)[set qcount 1]
     ;-------------------------------------
 
     repeat qcount[
