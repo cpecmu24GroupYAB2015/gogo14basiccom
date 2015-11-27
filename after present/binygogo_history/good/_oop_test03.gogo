@@ -4,15 +4,44 @@ show_binarygogo 1
 forever[
 ;----------------------------
     if(menu_ = 0)[
-        selc sensor8
+        if(not (press_btn sensor7)) [show "selc" ]
+        lampon 1
+        if( incolor sensor7 570 580)[
+            show "c 14" wait 2
+            set menu_ 14
+        ]
+        if(incolor sensor7 450 460 )[
+            show "c 24" wait 2
+            set menu_ 24
+        ]
+        if(incolor sensor7 320 340)[
+            show "c 34" wait 2
+        ]
+        if(incolor sensor7 138 152)[
+            show "c  4" wait 2
+        ]
+        if(incolor sensor7 530 540)[
+            show "c  1" wait 2
+            show "Easy" wait 10
+            show "redy" wait 30
+            beep
+            set menu_ 1
+        ]
+        if(incolor sensor7 400 410)[
+            show "c  2" wait 2
+            set menu_ 2
+        ]
+        if(incolor sensor7 250 260)[
+            show "c  3" wait 2
+            set menu_ 4
+        ]
     ]
 ;----------------------------
     if(not(menu_ = 0))[lampoff 1]
     if(menu_ = 14)[
         show readans
-        wait 1
-        lampon 1
-        wait 2 lampoff 1
+        lampon 1 wait 1
+        lampoff 1
     ]
     if(menu_ = 24)[
         set score 999
@@ -46,39 +75,6 @@ end
 
 ;---------------model---------------
 
-to selc :regis
-    if(not (press_btn sensor7))[show "selc" ]
-        lampon 1
-        if(incolor sensor7 570 580)[
-            show "c 14" wait 2
-            set menu_ 14
-        ]
-        if(incolor sensor7 450 460 or incolor sensor8 450 460 )[
-            show "c 24" wait 2
-            set menu_ 24
-        ]
-        if(incolor sensor7 320 340)[
-            show "c 34" wait 2
-        ]
-        if(incolor sensor7 138 152)[
-            show "c  4" wait 2
-        ]
-        if(incolor sensor7 530 540)[
-            show "c  1" wait 2
-            show "Easy" wait 10
-            show "redy" wait 30
-            beep
-            set menu_ 1
-        ]
-        if(incolor sensor7 400 410)[
-            show "c  2" wait 2
-            set menu_ 2
-        ]
-        if(incolor sensor7 250 260)[
-            show "c  3" wait 2
-            set menu_ 4
-        ]
-end
 
 to press_btn :port_
     if(port_ > 20)[output 1]
@@ -120,7 +116,7 @@ to ch_problem :level
     [problem level]
 end
 
-to problem_rep 
+to problem :level
     beep
     show "nQ"
     wait 10
@@ -128,6 +124,7 @@ to problem_rep
     wait 10
     show "see"
     wait 15
+    ;--------- set Question --------
     set p1 cal_
     set p2 cal_
     set p3 cal_
@@ -135,22 +132,56 @@ to problem_rep
     set p5 cal_
     set p6 cal_
     set question (sum_ p1 p2 p3 p4 p5 p6)
+    ;-------- end set queestion ---------
+
+    ;-------- standby Answer-------------
     lampon 3
     seem question 10
     reset_ans
+    set qcount 0
+    ifelse(menu_ > 50)[
+        set qcount (harder level)
+        problem qcount 
+    ][
+        set qcount level
+    ]
+    
+    repeat num[
+        time_ 7 0
+        lampoff 3
+        show "ansr"
+        wait 10
+        show readans
+        wait 10
+        show "ansr"
+        wait 10
+        show readans
+        wait 10
+        ifelse ( readans = question )[
+            set score score+1
+            show "corr"
+            wait 10
+        ][show "inco" wait 10]
+        show "out"
+        lampon 2
+        rbeep 60
+        set qcount (qcount-1)
+        wait 20
+        lampoff 2
+    ]
+    isHardcore level
+
 
 end
 
-to problem :level
-set qcount 0
-set qcount (harder level)
-repeat qcount[
-    problem_rep
-    wait 10
-    show "redy"
-    wait 15     
-    rbeep 30
-    time_ 7 0
+to isHardcore :level
+    ifelse(level > 50)[time_ 7 1]
+    [time_ 7 0 ]
+end
+
+to problem :num :type
+repeat num[    
+    
     lampoff 3
     show "ansr"
     wait 10
@@ -181,21 +212,7 @@ repeat num[
     rbeep 30
     time_ 7 1
     lampoff 3
-    show "ansr"
-    wait 10
-    show readans
-    wait 10
-    ifelse ( readans = question )[
-        set score score+1
-        show "corr"
-        wait 10
-    ][show "inco" wait 10]
-    show "out"
-    lampon 2
-    rbeep 60
-    set qcount (qcount-1)
-    wait 20
-    lampoff 2
+    
 ]
 end
 
@@ -208,7 +225,7 @@ to show_binarygogo :delay
 end
 
 to your_score
-show "   U" wait 3 show "  U " wait 3 show " U S" wait 3 show "U sc" wait 3 show " scr" wait 3 show "scro" wait 3 show "cror" wait 3 show "rore" wait 3 show "ore " wait 3 show "re  " wait 3 show "e  " wait 3 show "    " wait 3 show "is" wait 8 beep show score wait 20 rbeep 20
+show "Scor" wait 15 show "is" wait 10 beep show score wait 20 rbeep 20
 end
 
 ;+------------ Time -----------+
@@ -285,15 +302,25 @@ to lampoff :num
     if(num = 4)[d, off]
 end
 
+to menu_circle :port
+    if(incolor port 0 5)[set menu_ 1]
+    if(incolor port 23 24)[set menu_ 1]
+    if(incolor port 48 59)[set menu_ 1]
+    if(incolor port 91 100)[set menu_ 1]
+    if(incolor port 131 150)[set menu_ 1]
+    if(incolor port 180 230)[set menu_ 1]
+end
+
+
 to incolor :port :min :max
     ifelse(port > min-10 and port < max+10)[output 1][output 0]
 end
 
 to colorchk :port :min1 :max1 :min0 :max0
-    if(incolor port min1 max1)[set ref port wait 3 
+    if(incolor port min1 max1)[set ref port wait 1
         ifelse(incolor ref (ref-5) (ref+5))[output 1][ output 99]
     ]
-    ifelse(incolor port min0 max0)[set ref port wait 3 
+    ifelse(incolor port min0 max0)[set ref port wait 1
         ifelse(incolor ref (ref-5) (ref+5)) [output 0][ output 99]
     ][output 99]
 end
@@ -301,7 +328,7 @@ end
 
 to readans
     ;set ans sum_ 1 0 0 0 0 1
-    set ans sum_ (colorchk sensor1 286 296 988 993 ) (colorchk sensor2 238 247 987 994 ) (colorchk sensor3 169 186 974 990 ) (colorchk sensor4 246 261 990 998) (colorchk sensor5 298 320 990 998) (colorchk sensor6 192 220 983 993)
+    set ans sum_ (colorchk sensor1 286 296 988 993 ) (colorchk sensor2 238 247 987 994 ) (colorchk sensor3 169 186 974 990 ) (colorchk sensor4 224 261 990 998) (colorchk sensor5 298 320 990 998) (colorchk sensor6 192 220 983 993)
     ifelse(ans > 63)[output 999][output ans]
 end
 

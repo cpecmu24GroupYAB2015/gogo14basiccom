@@ -1,0 +1,314 @@
+; # Version 2 build 056
+; # Optimite code and reduce variable strack for GoGo firework v4.111
+
+to autorun
+reset_all
+show_binarygogo 1
+forever[
+;----------------------------
+    if(menu_ = 0)[
+        if(not (press_btn sensor7)) [show "selc" ]
+        lampon 1
+        if( incolor sensor7 570 580)[
+            show "c 14" wait 2
+            set menu_ 14
+        ]
+        if(incolor sensor7 450 460 )[
+            show "c 24" wait 2
+            set menu_ 24
+        ]
+        if(incolor sensor7 320 340)[
+            show "c 34" wait 2
+        ]
+        if(incolor sensor7 138 152)[
+            show "c  4" wait 2
+        ]
+        if(incolor sensor7 530 540)[
+            show "c  1" wait 2
+            show "Easy" wait 10
+            show "redy" wait 30
+            beep
+            set menu_ 51
+        ]
+        if(incolor sensor7 400 410)[
+            show "c  2" wait 2
+            set menu_ 2
+        ]
+        if(incolor sensor7 250 260)[
+            show "c  3" wait 2
+            set menu_ 4
+        ]
+    ]
+;----------------------------
+    if(not(menu_ = 0))[lampoff 1]
+    if(menu_ = 14)[
+        show readans
+        lampon 1 wait 1
+        lampoff 1
+    ]
+    if(menu_ = 24)[
+        set score 999
+        wining 1
+        wait 10
+        reset_all
+    ]
+;------ Menu Game ------------
+    if(menu_ = 51)[
+        problem 2
+        your_score
+        wining 1
+        reset_all
+    ]
+    if(menu_ = 2)[
+        problem 2
+        your_score
+        wining 2
+        reset_all
+    ]
+    if(menu_ = 3)[
+        set score 500
+        wining 1
+        set menu_ 0
+    ]
+    if(menu_ = 4)[
+        show readans
+    ]
+]
+end
+
+
+;_____________model__________________
+
+
+to press_btn :port_
+; ### When any presses buttom than return true
+    if(port_ > 120)[output 1]
+    output 0
+end
+
+to reset_all
+; ### reset All variable to default
+    abcd, off ccw
+    set menu_ 0
+    set score 0
+    reset_ans
+    set count 0
+    set qcount 0
+end
+
+to harder :num
+; ### Calculate the total number of questions as hyperbola
+    output ((num+17)*(num+19)*(num+17))/491
+end
+
+to wining :num 
+    ; ### giveaways function, work if you wins
+    if(score+1 > harder num )[
+        show "free"
+        repeat num[lampon 4 wait 2 lampoff 4 beep wait 10]
+    ]
+end
+
+to reset_ans
+; ### Reset only answers variable
+    set ans 0
+    set p1 0
+    set p2 0
+    set p3 0
+    set p4 0
+    set p5 0
+    set p6 0
+end
+
+to problem :level
+; ### A big function who prepared questions
+show "lll"
+    set qcount 0
+    ;-------------------------------------
+    ifelse(menu_ > 50)[
+        set qcount (harder level)
+        problem qcount 
+    ][
+        set qcount level
+    ]
+    ;-------------------------------------
+
+    repeat qcount[
+        ;------- show Q num ---------
+        beep
+        show "nQ"
+        wait 10
+        show qcount
+        wait 10
+        show "see"
+        wait 15
+        ;-------- end Q num ---------
+
+        ;--------- set Question --------
+        set p1 cal_
+        set p2 cal_
+        set p3 cal_
+        set p4 cal_
+        set p5 cal_
+        set p6 cal_
+        set question (sum_ p1 p2 p3 p4 p5 p6)
+        ;-------- end set queestion ---------
+
+        ;-------- show question -------------
+        lampon 3
+        seem question 10
+        reset_ans
+        ;--------- end show question ---------- 
+
+        ;------------ Game console -----------   
+
+        ifelse(menu_ > 50)[time_ 7 1][time_ 7 0 ]
+
+         lampoff 3
+
+         show "ansr"
+         beep
+         wait 10
+         show readans
+         wait 10
+
+         ifelse ( readans = question )[
+             set score score+1
+             show "corr"
+             wait 10
+         ][show "inco" wait 10]
+
+         show "out"
+         lampon 2
+         rbeep 60
+         set qcount (qcount-1)
+         wait 20
+         lampoff 2
+    ]
+end
+
+;_____________ View _________________
+to show_binarygogo :delay
+; ### Display a logoes
+ show "biny" beep wait delay show "   " wait delay+2 beep show "gogo" wait delay+2 show "b048" wait 5 show "selc" rbeep 20
+
+end
+
+to your_score
+; ### Show You Score after play finished
+show "Scor" wait 15 show "is" wait 10 beep show score wait 20 rbeep 20
+end
+
+;+------------ Time -----------+
+to time_ :sec :ms
+    set count 0
+    set count sec
+    ifelse(ms = 0)[
+        repeat (sec)[
+            wait 1
+            show count
+            if(press_btn sensor7)[stop]
+            ifelse(count > 0)[
+                if(count < 11)[beep]
+                set count (count-1)
+                wait 9
+            ][
+            rbeep 30 wait 10
+            ]
+        ]
+    ][
+        set count sec*10
+        repeat (sec*10)[
+            wait 1
+            show count
+            if(press_btn sensor7)[stop]
+            ifelse(count > 0)[
+                if(count < 50)[beep]
+                set count (count-1)
+            ][
+            rbeep 30 wait 10
+            ]
+        ]
+    ]
+    
+end
+
+;______________ Controller ___________________
+to cal_
+; ### Random binayry
+    output ((random 1) % 2)
+end
+
+to sum_ :p1 :p2 :p3 :p4 :p5 :p6
+; ### Find Summery of binary digit
+    output p1*1+p2*2+p3*4+p4*8+p5*16+p6*32
+end
+
+to rbeep :num
+; ### Loop beep
+    repeat num[beep]
+end
+
+to seem :p :sec
+;  ### Show Question in sec Seconds
+    set count 0
+    set count sec
+    repeat (sec)[
+        ifelse(count < 6)[
+            repeat 2[beep show p wait 5 beep show "    " wait 5]
+        ][
+            show p set count (count-1) wait 10
+        ]
+
+    ]set count 0
+end
+
+to lampon :num
+    if(num = 1)[a, on cw]
+    if(num = 2)[b, on]
+    if(num = 3)[c, on]
+    if(num = 4)[d, on]
+end
+
+to lampoff :num
+    if(num = 1)[a, off]
+    if(num = 2)[b, off]
+    if(num = 3)[c, off]
+    if(num = 4)[d, off]
+end
+
+to menu_circle :port
+    if(incolor port 0 5)[set menu_ 1]
+    if(incolor port 23 24)[set menu_ 1]
+    if(incolor port 48 59)[set menu_ 1]
+    if(incolor port 91 100)[set menu_ 1]
+    if(incolor port 131 150)[set menu_ 1]
+    if(incolor port 180 230)[set menu_ 1]
+end
+
+
+to incolor :port :min :max
+    ifelse(port > min-10 and port < max+10)[output 1][output 0]
+end
+
+to colorchk :port :min1 :max1 :min0 :max0
+    if(incolor port min1 max1)[set ref port wait 1
+        ifelse(incolor ref (ref-5) (ref+5))[output 1][ output 99]
+    ]
+    ifelse(incolor port min0 max0)[set ref port wait 1
+        ifelse(incolor ref (ref-5) (ref+5)) [output 0][ output 99]
+    ][output 99]
+end
+
+
+to readans
+    set ans sum_ (colorchk sensor1 286 296 988 993 ) (colorchk sensor2 238 247 987 994 ) (colorchk sensor3 169 186 974 990 ) (colorchk sensor4 224 261 990 998) (colorchk sensor5 298 320 990 998) (colorchk sensor6 192 220 983 993)
+    ifelse(ans > 63)[output 999][output ans]
+end
+
+to set_mean :value_
+    show "6666"
+    wait 2
+    show ""
+
+end
